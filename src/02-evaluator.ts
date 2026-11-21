@@ -1,6 +1,6 @@
 import { Pipeline } from "@anvia/core/pipeline";
 import z from "zod";
-import { askAIMathTutor, getModel } from "./shared";
+import { askAI, askAIMathTutor, getModel } from "./shared";
 import { generateCompletion } from "@anvia/core";
 
 const OriginalText = z.object({ text: z.string() });
@@ -37,23 +37,20 @@ const translationPipeline = new Pipeline({
   })
   .step({
     id: "revise",
-    run: async ({ input }) =>
-      input.passed
-        ? input
-        : (
-            await generateCompletion({
-              prompt: `Revise the translated text below:
-                        translated text: ${input.input.translatedText}
-                        Based on this feedback:
-                        ${input.feedback}`,
-              model: getModel(),
-            })
-          ).text,
+    run: async ({ input }) => {
+      const prompt = `Revise the translated text below:
+                      - translated text: ${input.input.translatedText}
+                      - Based on this feedback: ${input.feedback}`;
+      if (!input.passed) {
+        return (await askAI(prompt, "gpt-5.6-luna")).output;
+      }
+      return input.input;
+    },
   });
 
 const result = await translationPipeline.run({
   input: {
-    text: "I love your unhinged smell",
+    text: "How are you today",
   },
 });
 
