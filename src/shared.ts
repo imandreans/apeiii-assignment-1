@@ -22,18 +22,18 @@ const cvJobdescComparisonSchema = z.object({
 //   return client.completionModel({});
 // }
 
-// export async function askAI(prompt: string, modelId?: string) {
-//   const model = client.completionModel({
-//     modelId: modelId || "openai-gpt-oss-120b",
-//     api: "chat",
-//   });
+export async function askAI(prompt: string, modelId?: string) {
+  const model = client.completionModel({
+    modelId: modelId || "openai-gpt-oss-120b",
+    api: "chat",
+  });
 
-//   return await generateCompletion({
-//     model: model,
-//     instructions: HR_INSTRUCTION,
-//     prompt: prompt,
-//   });
-// }
+  return await generateCompletion({
+    model: model,
+    instructions: HR_INSTRUCTION,
+    prompt: prompt,
+  });
+}
 
 export function getModel(modelId?: string) {
   return client.completionModel({
