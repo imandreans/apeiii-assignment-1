@@ -45,10 +45,6 @@ const result = await router.run({
   input: {
     message: "What's your mom's name?",
   },
-  //   observer: {
-  //     onEvent: (event) => console.log(event.type, event.node.id),
-  //   },
 });
 
 console.log(result.output);
-// console.log(router.graph().nodes.map((node) => node.id));

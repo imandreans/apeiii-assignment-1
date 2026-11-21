@@ -1,6 +1,6 @@
 import { Pipeline } from "@anvia/core/pipeline";
 import z from "zod";
-import { askAI, askAIMathTutor, getModel } from "./shared";
+import { askAI, getModel } from "./shared";
 import { generateCompletion } from "@anvia/core";
 
 const OriginalText = z.object({ text: z.string() });

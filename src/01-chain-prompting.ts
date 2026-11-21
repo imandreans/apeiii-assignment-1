@@ -47,19 +47,26 @@ const myPipeline = new Pipeline({
   .step({
     id: "calculate-requirement-percentages",
     run: async (ctx) => {
-      const prompt = `Help me to get the suitability percentage between my CV and the job description. Here's the output format that you can use for your answer: 
-      - Fulfilled requirements [(%), (80% Threshold) and Overall Match [(%), (80% Threshold)] (Calculate the percentages from the fulfilled requirements)
-
-      Follow the 'cvJobdescComparisonSchema', to return the output, here's the description:
-      - fitAssessment: Explain in detail with table format each requirements in Job Description with its own match percentages
-      - matchPercentage: Overall match percentage.
-      
-      Here's the Job Description:
-      ${ctx.input.jobDesc}
-
-      Here's my CV:
-      ${ctx.input.cv}
-      `;
+      const prompt = `
+<task>
+  Help me to get the suitability percentage between my CV and the job description.
+</task>
+<scoring>
+  - Fulfilled requirements [(%), (Min 80% to pass)]
+- Overall Match [(%), (Min 80% to pass)] (Calculate the percentages from the fulfilled requirements)
+</scoring>
+<output-schema>
+  - fitAssessment: Explain in detail with table format each requirements in Job Description with its own match percentages
+- matchPercentage: Overall match percentage.
+</output-schema>
+<data>
+  <job-description>
+    ${ctx.input.jobDesc}
+  </job-description>
+  <cv>
+    ${ctx.input.cv}
+  </cv>
+</data>`;
       const result = await compareCVtoJobDesc(prompt);
       return result;
     },
@@ -67,11 +74,18 @@ const myPipeline = new Pipeline({
   .step({
     id: "summary-feedback",
     run: async (ctx) => {
-      const prompt = `Based on the CV fit assessment below, provide summary of gaps, strength, and improvement that can be added to the CV.
+      const prompt = `
+      <task>
+      Based on the CV fit assessment below, provide summary of gaps, strength, and improvement that can be added to the CV.
       Make it in paragraph format or concise bullet points, not table. 
-      Here's the fit assessment:
+      </task>
+      <match-percentage>
+      ${ctx.input.output.matchPercentage}
+      </match-percentage>
+      <fit-assessment>
        ${ctx.input.output.fitAssessment}
-      `;
+      </fit-assessment>
+       `;
       const result = await askAI(prompt);
       return {
         feedback: result,
